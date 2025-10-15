@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    /* Add close button to success messages */
+    .messagelist li {
+        position: relative;
+        padding-right: 40px;
+    }
+    
+    .messagelist li .close-message {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #dc3545;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 0 8px;
+        opacity: 0.8;
+        transition: all 0.2s;
+    }
+    
+    .messagelist li .close-message:hover {
+        opacity: 1;
+        color: #c82333;
+        transform: translateY(-50%) scale(1.1);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add close buttons to all messages
+        const messages = document.querySelectorAll('.messagelist li');
+        messages.forEach(function(message) {
+            // Create close button
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'close-message';
+            closeBtn.innerHTML = '×';
+            closeBtn.setAttribute('aria-label', 'Close message');
+            closeBtn.setAttribute('type', 'button');
+            
+            // Add click handler
+            closeBtn.addEventListener('click', function() {
+                message.style.transition = 'opacity 0.3s, transform 0.3s';
+                message.style.opacity = '0';
+                message.style.transform = 'translateX(100%)';
+                setTimeout(function() {
+                    message.remove();
+                    // Remove entire messagelist if empty
+                    const messageList = document.querySelector('.messagelist');
+                    if (messageList && messageList.children.length === 0) {
+                        messageList.remove();
+                    }
+                }, 300);
+            });
+            
+            message.appendChild(closeBtn);
+        });
+    });
+</script>
+{% endblock %}

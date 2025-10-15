@@ -1,0 +1,26 @@
+# Production Requirements for Lookbook
+
+# Core Django
+Django>=4.2,<5.0
+djangorestframework>=3.14.0
+
+# Database
+psycopg2-binary>=2.9.0  # PostgreSQL adapter
+
+# CORS
+django-cors-headers>=4.0.0
+
+# Image handling
+Pillow>=10.0.0
+
+# WSGI Server
+gunicorn>=21.2.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Security
+django-environ>=0.11.0
+
+# Static files (if using whitenoise)
+whitenoise>=6.5.0
