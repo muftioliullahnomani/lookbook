@@ -1,0 +1,22 @@
+Options -MultiViews
+
+PassengerEnabled On
+
+# Use server virtualenv Python interpreter
+PassengerPython /home/eduaidis/virtualenv/backend/3.13/bin/python
+
+# Ensure Django settings are set (cPanel can also set env vars in UI)
+SetEnv DJANGO_SETTINGS_MODULE lookbook.settings
+SetEnv DJANGO_DEBUG 0
+
+RewriteEngine On
+
+# Serve existing static and media files directly
+RewriteCond %{REQUEST_URI} ^/(static|media)/ [OR]
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# Fallback all other requests to Passenger/Django
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ passenger_wsgi.py [QSA,L]

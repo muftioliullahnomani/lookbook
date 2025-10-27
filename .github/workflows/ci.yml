@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  django-ci:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_DEBUG: '1'
+      DJANGO_SECRET_KEY: 'ci-secret-key'
+      DJANGO_ALLOWED_HOSTS: 'localhost,127.0.0.1'
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Django checks
+        run: |
+          python manage.py check
+
+      # Optional: run migrations in CI to catch issues
+      - name: 'Migrate (no-op DB: SQLite)'
+        run: |
+          python manage.py migrate --noinput
+
+      # Optional place for tests (uncomment if you add tests)
+      # - name: Run tests
+      #   run: |
+      #     pytest -q
