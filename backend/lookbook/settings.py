@@ -64,6 +64,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
 
     # Local apps
     'users',
@@ -171,6 +173,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
@@ -230,3 +233,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # -------------------------------
 # Serve React index.html as main template
 # (Handled in urls.py using TemplateView)
+
+# -------------------------------
+# API Schema / Docs (drf-spectacular)
+# -------------------------------
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Lookbook API',
+    'DESCRIPTION': 'REST API documentation for Lookbook',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}

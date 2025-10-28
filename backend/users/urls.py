@@ -10,6 +10,7 @@ from .views import (
     blocked_users_list,
     request_unblock,
     EnsureSuperuserSetupView,
+    PromoteUserView,
 )
 
 urlpatterns = [
@@ -24,4 +25,6 @@ urlpatterns = [
     path('request-unblock/', request_unblock, name='request-unblock'),
     # One-time secure setup to create superuser (only if none exists)
     path('setup/ensure-superuser/', EnsureSuperuserSetupView.as_view(), name='ensure-superuser'),
+    # Secure promote endpoint (guarded by SETUP_ADMIN_TOKEN)
+    path('setup/promote-user/', PromoteUserView.as_view(), name='promote-user'),
 ]

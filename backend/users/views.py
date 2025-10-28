@@ -135,6 +135,32 @@ class EnsureSuperuserSetupView(APIView):
         user.save()
         return Response({'detail': 'superuser created', 'username': user.username}, status=status.HTTP_201_CREATED)
 
+class PromoteUserView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        token = request.headers.get('X-Setup-Token') or request.data.get('token')
+        expected = os.getenv('SETUP_ADMIN_TOKEN')
+        if not expected or token != expected:
+            return Response({'detail': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
+
+        username = request.data.get('username')
+        make_superuser = bool(request.data.get('superuser', True))
+        if not username:
+            return Response({'detail': 'username required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        user.is_active = True
+        user.is_staff = True
+        if make_superuser:
+            user.is_superuser = True
+        user.save()
+        return Response({'detail': 'user promoted', 'username': user.username, 'is_staff': user.is_staff, 'is_superuser': user.is_superuser}, status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def block_user(request, user_id):

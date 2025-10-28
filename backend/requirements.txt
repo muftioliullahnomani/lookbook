@@ -3,6 +3,8 @@ Django==5.2.7
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.4.0
 django-cors-headers==4.6.0
+drf-spectacular==0.27.2
+drf-spectacular-sidecar==2024.10.1
 
 # === Static & Production Handling ===
 whitenoise==6.7.0
