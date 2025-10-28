@@ -35,3 +35,4 @@ else:
         sync: false
       - key: DJANGO_SUPERUSER_PASSWORD
         sync: false
+        
