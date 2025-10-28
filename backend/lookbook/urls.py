@@ -5,8 +5,12 @@ from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenRefreshView
 from users.views import CustomTokenObtainPairView
 from django.views.static import serve
+from django.http import JsonResponse
 
 urlpatterns = [
+    # Root and health check
+    path('', lambda r: JsonResponse({"status": "ok", "service": "lookbook-backend"})),
+    path('healthz/', lambda r: JsonResponse({"status": "healthy"})),
     path('admin/', admin.site.urls),
 
     # JWT Authentication
