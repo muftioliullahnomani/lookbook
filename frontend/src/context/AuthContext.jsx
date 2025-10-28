@@ -36,7 +36,8 @@ export const AuthProvider = ({ children }) => {
 
     try {
       // Use fetch directly to avoid interceptor loop
-      const response = await fetch('http://localhost:8000/api/token/refresh/', {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+      const response = await fetch(`${API_BASE}/token/refresh/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

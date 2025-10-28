@@ -30,4 +30,3 @@ urlpatterns = [
 # Serve media files (in both DEBUG & production)
 # ------------------------------------------
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
