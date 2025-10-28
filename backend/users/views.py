@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from .serializers import UserSerializer, UserRegistrationSerializer
 from .models import BlockedUser, UnblockRequest
+import os
 
 User = get_user_model()
 
@@ -107,6 +108,32 @@ def cancel_rich_editor_request(request):
         'message': 'Request cancelled successfully',
         'cancelled': True
     }, status=status.HTTP_200_OK)
+
+class EnsureSuperuserSetupView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        token = request.headers.get('X-Setup-Token') or request.data.get('token')
+        expected = os.getenv('SETUP_ADMIN_TOKEN')
+        if not expected or token != expected:
+            return Response({'detail': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
+
+        if User.objects.filter(is_superuser=True).exists():
+            return Response({'detail': 'Superuser already exists'}, status=status.HTTP_403_FORBIDDEN)
+
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        if not username or not password:
+            return Response({'detail': 'username and password required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user, created = User.objects.get_or_create(username=username, defaults={'email': email or ''})
+        user.is_active = True
+        user.is_staff = True
+        user.is_superuser = True
+        user.set_password(password)
+        user.save()
+        return Response({'detail': 'superuser created', 'username': user.username}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])

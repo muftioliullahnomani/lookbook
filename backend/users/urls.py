@@ -1,5 +1,16 @@
 from django.urls import path
-from .views import UserRegistrationView, UserProfileView, UserDetailView, request_rich_editor_access, cancel_rich_editor_request, block_user, unblock_user, blocked_users_list, request_unblock
+from .views import (
+    UserRegistrationView,
+    UserProfileView,
+    UserDetailView,
+    request_rich_editor_access,
+    cancel_rich_editor_request,
+    block_user,
+    unblock_user,
+    blocked_users_list,
+    request_unblock,
+    EnsureSuperuserSetupView,
+)
 
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='user-register'),
@@ -11,4 +22,6 @@ urlpatterns = [
     path('<int:user_id>/unblock/', unblock_user, name='unblock-user'),
     path('blocked/', blocked_users_list, name='blocked-users'),
     path('request-unblock/', request_unblock, name='request-unblock'),
+    # One-time secure setup to create superuser (only if none exists)
+    path('setup/ensure-superuser/', EnsureSuperuserSetupView.as_view(), name='ensure-superuser'),
 ]
