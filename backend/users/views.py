@@ -5,9 +5,16 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .serializers import UserSerializer, UserRegistrationSerializer
+from .serializers import (
+    UserSerializer,
+    UserRegistrationSerializer,
+    EnsureSuperuserRequestSerializer,
+    PromoteUserRequestSerializer,
+)
 from .models import BlockedUser, UnblockRequest
 import os
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 
 User = get_user_model()
 
@@ -112,6 +119,28 @@ def cancel_rich_editor_request(request):
 class EnsureSuperuserSetupView(APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=EnsureSuperuserRequestSerializer,
+        responses={
+            201: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="superuser created",
+                examples=[{"detail": "superuser created", "username": "admin"}],
+            ),
+            403: OpenApiResponse(description="Forbidden or superuser already exists"),
+            400: OpenApiResponse(description="Bad Request"),
+        },
+        parameters=[
+            OpenApiParameter(
+                name="X-Setup-Token",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                description="Setup admin token. Alternatively provide 'token' in request body.",
+                required=False,
+            )
+        ],
+        description="One-time endpoint to create a superuser if none exists. Protected by SETUP_ADMIN_TOKEN (X-Setup-Token header or token in body).",
+    )
     def post(self, request):
         token = request.headers.get('X-Setup-Token') or request.data.get('token')
         expected = os.getenv('SETUP_ADMIN_TOKEN')
@@ -138,6 +167,29 @@ class EnsureSuperuserSetupView(APIView):
 class PromoteUserView(APIView):
     permission_classes = [permissions.AllowAny]
 
+    @extend_schema(
+        request=PromoteUserRequestSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=OpenApiTypes.OBJECT,
+                description="user promoted",
+                examples=[{"detail": "user promoted", "username": "john", "is_staff": True, "is_superuser": True}],
+            ),
+            403: OpenApiResponse(description="Forbidden"),
+            404: OpenApiResponse(description="User not found"),
+            400: OpenApiResponse(description="Bad Request"),
+        },
+        parameters=[
+            OpenApiParameter(
+                name="X-Setup-Token",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                description="Setup admin token. Alternatively provide 'token' in request body.",
+                required=False,
+            )
+        ],
+        description="Promote an existing user to staff/superuser. Protected by SETUP_ADMIN_TOKEN (X-Setup-Token header or token in body).",
+    )
     def post(self, request):
         token = request.headers.get('X-Setup-Token') or request.data.get('token')
         expected = os.getenv('SETUP_ADMIN_TOKEN')

@@ -50,3 +50,14 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         user = User.objects.create_user(**validated_data)
         return user
+
+class EnsureSuperuserRequestSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    email = serializers.EmailField(required=False, allow_blank=True)
+    password = serializers.CharField(write_only=True)
+    token = serializers.CharField(required=False, write_only=True, help_text="Optional. Can also be provided via X-Setup-Token header")
+
+class PromoteUserRequestSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    superuser = serializers.BooleanField(required=False, default=True)
+    token = serializers.CharField(required=False, write_only=True, help_text="Optional. Can also be provided via X-Setup-Token header")

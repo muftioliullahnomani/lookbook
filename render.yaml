@@ -8,10 +8,10 @@ services:
       python manage.py collectstatic --noinput || echo "No static to collect"
       python manage.py migrate --noinput || echo "Migration step completed"
       # Ensure superuser (idempotent) if DJANGO_SUPERUSER_* envs are set
-      python manage.py shell -c "import os; from django.contrib.auth import get_user_model; U=get_user_model(); u=os.getenv('DJANGO_SUPERUSER_USERNAME', 'admin'); p=os.getenv('DJANGO_SUPERUSER_PASSWORD', '123321' ); e=os.getenv('DJANGO_SUPERUSER_EMAIL','example@mail.com');
+      python manage.py shell -c "import os; from django.contrib.auth import get_user_model; U=get_user_model(); u=os.getenv('DJANGO_SUPERUSER_USERNAME'); p=os.getenv('DJANGO_SUPERUSER_PASSWORD'); e=os.getenv('DJANGO_SUPERUSER_EMAIL','admin@example.com');
 if u and p:
     obj, created = U.objects.get_or_create(username=u, defaults={'email': e});
-    obj.is_staff=True; obj.is_superuser=True; obj.set_password(p); obj.save();
+    obj.is_active=True; obj.is_staff=True; obj.is_superuser=True; obj.set_password(p); obj.save();
     print('superuser ensured:', u, 'created=', created)
 else:
     print('skip superuser creation: DJANGO_SUPERUSER_* not set')"
@@ -26,13 +26,12 @@ else:
       - key: DJANGO_ALLOWED_HOSTS
         value: .onrender.com
       - key: DJANGO_CORS_ALLOWED_ORIGINS
-        sync: false
+        value: https://<your-frontend>.onrender.com
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
-        sync: false
+        value: https://lookbook-backend-qwfs.onrender.com
       - key: DJANGO_SUPERUSER_USERNAME
         sync: false
       - key: DJANGO_SUPERUSER_EMAIL
         sync: false
       - key: DJANGO_SUPERUSER_PASSWORD
         sync: false
-        
