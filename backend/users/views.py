@@ -125,7 +125,6 @@ class EnsureSuperuserSetupView(APIView):
             201: OpenApiResponse(
                 response=OpenApiTypes.OBJECT,
                 description="superuser created",
-                examples=[{"detail": "superuser created", "username": "admin"}],
             ),
             403: OpenApiResponse(description="Forbidden or superuser already exists"),
             400: OpenApiResponse(description="Bad Request"),
@@ -173,7 +172,6 @@ class PromoteUserView(APIView):
             200: OpenApiResponse(
                 response=OpenApiTypes.OBJECT,
                 description="user promoted",
-                examples=[{"detail": "user promoted", "username": "john", "is_staff": True, "is_superuser": True}],
             ),
             403: OpenApiResponse(description="Forbidden"),
             404: OpenApiResponse(description="User not found"),
